@@ -1,9 +1,10 @@
 
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
+import HTMLFlipBook from "react-pageflip";
 import { JournalEntry } from "@/types";
 import JournalPage from "./JournalPage";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 interface PageFlipBookProps {
   entries: JournalEntry[];
@@ -11,85 +12,86 @@ interface PageFlipBookProps {
 
 const PageFlipBook = ({ entries }: PageFlipBookProps) => {
   const [currentPage, setCurrentPage] = useState(0);
-  const [flipping, setFlipping] = useState(false);
-  const [flipDirection, setFlipDirection] = useState<'next' | 'prev' | null>(null);
+  const bookRef = useRef<any>(null);
   
-  const totalPages = Math.ceil(entries.length / 2);
+  // Calculate total pages including blank pages to maintain even number
+  const totalPages = Math.ceil(entries.length / 2) * 2;
   
-  const getEntriesForSpread = () => {
-    const startIdx = currentPage * 2;
-    return [
-      entries[startIdx] || null,
-      entries[startIdx + 1] || null,
-    ];
+  const handlePageFlip = (e: any) => {
+    setCurrentPage(e.data);
   };
   
-  const handlePrevPage = () => {
-    if (currentPage > 0 && !flipping) {
-      setFlipping(true);
-      setFlipDirection('prev');
-      setTimeout(() => {
-        setCurrentPage(currentPage - 1);
-        setFlipping(false);
-        setFlipDirection(null);
-      }, 500);
+  const nextPage = () => {
+    if (bookRef.current) {
+      bookRef.current.pageFlip().flipNext();
     }
   };
   
-  const handleNextPage = () => {
-    if (currentPage < totalPages - 1 && !flipping) {
-      setFlipping(true);
-      setFlipDirection('next');
-      setTimeout(() => {
-        setCurrentPage(currentPage + 1);
-        setFlipping(false);
-        setFlipDirection(null);
-      }, 500);
+  const prevPage = () => {
+    if (bookRef.current) {
+      bookRef.current.pageFlip().flipPrev();
     }
   };
   
-  const currentEntries = getEntriesForSpread();
+  // Create array of page entries including blanks
+  const pageEntries = [...entries];
+  while (pageEntries.length < totalPages) {
+    pageEntries.push(null);
+  }
   
   return (
-    <div className="relative mx-auto max-w-5xl my-10">
-      <div className={`
-        relative flex transition-all duration-500 transform
-        ${flipping && flipDirection === 'next' ? 'animate-page-flip-right' : ''}
-        ${flipping && flipDirection === 'prev' ? 'animate-page-flip-left' : ''}
-      `}>
-        <div className="w-1/2 h-full shadow-inner mr-0.5">
-          {currentEntries[0] && (
-            <JournalPage entry={currentEntries[0]} isEven={true} />
-          )}
-        </div>
-        <div className="w-1/2 h-full shadow-inner ml-0.5">
-          {currentEntries[1] && (
-            <JournalPage entry={currentEntries[1]} isEven={false} />
-          )}
-        </div>
+    <div className="relative mx-auto my-10">
+      <div className="flex justify-center">
+        <HTMLFlipBook
+          width={550}
+          height={733} // A4 proportions
+          showCover={true}
+          maxShadowOpacity={0.5}
+          ref={bookRef}
+          onFlip={handlePageFlip}
+          className="shadow-xl"
+          startPage={0}
+          size="fixed"
+          minWidth={315}
+          maxWidth={1000}
+          minHeight={400}
+          maxHeight={1533}
+        >
+          {pageEntries.map((entry, index) => (
+            <div key={index} className="demoPage">
+              {entry ? (
+                <JournalPage entry={entry} isEven={index % 2 === 0} />
+              ) : (
+                <div className="diary-page page-shadow bg-card h-[733px]" />
+              )}
+            </div>
+          ))}
+        </HTMLFlipBook>
       </div>
       
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={handlePrevPage}
-        disabled={currentPage <= 0 || flipping}
-        className="page-turn-prev"
-        aria-label="Previous page"
-      >
-        <ArrowLeft className="h-5 w-5" />
-      </Button>
-      
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={handleNextPage}
-        disabled={currentPage >= totalPages - 1 || flipping}
-        className="page-turn-next"
-        aria-label="Next page"
-      >
-        <ArrowRight className="h-5 w-5" />
-      </Button>
+      <div className="flex justify-between absolute w-full top-1/2 -translate-y-1/2 px-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={prevPage}
+          disabled={currentPage === 0}
+          className="bg-background/80 hover:bg-background"
+          aria-label="Previous page"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={nextPage}
+          disabled={currentPage >= totalPages - 2}
+          className="bg-background/80 hover:bg-background"
+          aria-label="Next page"
+        >
+          <ArrowRight className="h-5 w-5" />
+        </Button>
+      </div>
       
       <div className="text-center mt-4 text-sm text-muted-foreground">
         Page {currentPage + 1} of {totalPages}

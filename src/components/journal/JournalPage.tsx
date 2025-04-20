@@ -1,8 +1,6 @@
 
-import { useState, useRef, useEffect } from "react";
-import { JournalEntry } from "@/types";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
+import { JournalEntry } from "@/types";
 
 interface JournalPageProps {
   entry: JournalEntry;
@@ -20,8 +18,8 @@ const JournalPage = ({ entry, isEven }: JournalPageProps) => {
   };
 
   return (
-    <div className={`diary-page page-shadow ${isEven ? 'bg-card' : 'bg-muted/30'}`}>
-      <div className="p-6">
+    <div className={`diary-page h-[733px] w-[550px] ${isEven ? 'bg-card' : 'bg-muted/30'}`}>
+      <div className="p-8 overflow-y-auto h-full">
         <div className="mb-4 border-b pb-2">
           <h2 className="text-2xl font-bold font-journal text-primary">
             {entry.title}
@@ -33,7 +31,7 @@ const JournalPage = ({ entry, isEven }: JournalPageProps) => {
           </p>
         </div>
         
-        <div className="journal-content whitespace-pre-line">
+        <div className="journal-content whitespace-pre-line mb-4">
           {entry.content}
         </div>
         
