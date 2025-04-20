@@ -40,8 +40,8 @@ const PageFlipBook = ({ entries }: PageFlipBookProps) => {
   }
   
   return (
-    <div className="relative mx-auto my-10">
-      <div className="flex justify-center">
+    <div className="relative mx-auto my-10 px-4">
+      <div className="flex justify-center perspective-[2000px]">
         <HTMLFlipBook
           width={550}
           height={733}
@@ -54,7 +54,7 @@ const PageFlipBook = ({ entries }: PageFlipBookProps) => {
           showCover={true}
           mobileScrollSupport={true}
           onFlip={handlePageFlip}
-          className="shadow-xl"
+          className="shadow-2xl"
           startPage={0}
           drawShadow={true}
           flippingTime={1000}
@@ -67,44 +67,45 @@ const PageFlipBook = ({ entries }: PageFlipBookProps) => {
           showPageCorners={true}
           disableFlipByClick={false}
           ref={bookRef}
+          style={{ backgroundImage: "linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)" }}
         >
           {pageEntries.map((entry, index) => (
-            <div key={index} className="demoPage">
+            <div key={index} className="page-wrapper">
               {entry ? (
                 <JournalPage entry={entry} isEven={index % 2 === 0} />
               ) : (
-                <div className="diary-page page-shadow bg-card h-[733px]" />
+                <div className="diary-page page-shadow bg-gradient-to-br from-card to-muted/30 h-[733px]" />
               )}
             </div>
           ))}
         </HTMLFlipBook>
       </div>
       
-      <div className="flex justify-between absolute w-full top-1/2 -translate-y-1/2 px-4">
+      <div className="flex justify-between absolute w-full top-1/2 -translate-y-1/2 px-8">
         <Button
-          variant="ghost"
+          variant="secondary"
           size="icon"
           onClick={prevPage}
           disabled={currentPage === 0}
-          className="bg-background/80 hover:bg-background"
+          className="rounded-full bg-background/80 hover:bg-background shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105"
           aria-label="Previous page"
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
         
         <Button
-          variant="ghost"
+          variant="secondary"
           size="icon"
           onClick={nextPage}
           disabled={currentPage >= totalPages - 2}
-          className="bg-background/80 hover:bg-background"
+          className="rounded-full bg-background/80 hover:bg-background shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105"
           aria-label="Next page"
         >
           <ArrowRight className="h-5 w-5" />
         </Button>
       </div>
       
-      <div className="text-center mt-4 text-sm text-muted-foreground">
+      <div className="text-center mt-6 text-sm font-journal text-muted-foreground">
         Page {currentPage + 1} of {totalPages}
       </div>
     </div>
