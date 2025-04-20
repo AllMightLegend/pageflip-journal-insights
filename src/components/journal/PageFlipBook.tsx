@@ -1,8 +1,8 @@
-
 import { useState, useRef } from "react";
 import HTMLFlipBook from "react-pageflip";
 import { JournalEntry } from "@/types";
 import JournalPage from "./JournalPage";
+import DecorativePage from "./DecorativePage";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
@@ -14,8 +14,8 @@ const PageFlipBook = ({ entries }: PageFlipBookProps) => {
   const [currentPage, setCurrentPage] = useState(0);
   const bookRef = useRef<any>(null);
   
-  // Calculate total pages including blank pages to maintain even number
-  const totalPages = Math.ceil(entries.length / 2) * 2;
+  // Calculate total pages including decorative pages
+  const totalPages = Math.ceil(entries.length * 1.5) * 2;
   
   const handlePageFlip = (e: any) => {
     setCurrentPage(e.data);
@@ -33,10 +33,21 @@ const PageFlipBook = ({ entries }: PageFlipBookProps) => {
     }
   };
   
-  // Create array of page entries including blanks
-  const pageEntries = [...entries];
-  while (pageEntries.length < totalPages) {
-    pageEntries.push(null);
+  // Create array of pages including decorative pages
+  const pages = [];
+  let entryIndex = 0;
+  
+  for (let i = 0; i < totalPages; i++) {
+    if (i % 3 !== 2) { // Add journal entries on non-decorative pages
+      if (entries[entryIndex]) {
+        pages.push(entries[entryIndex]);
+        entryIndex++;
+      } else {
+        pages.push(null);
+      }
+    } else { // Add decorative page every third spread
+      pages.push('decorative');
+    }
   }
   
   return (
@@ -66,13 +77,14 @@ const PageFlipBook = ({ entries }: PageFlipBookProps) => {
           swipeDistance={30}
           showPageCorners={true}
           disableFlipByClick={false}
-          ref={bookRef}
           style={{ backgroundImage: "linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)" }}
         >
-          {pageEntries.map((entry, index) => (
+          {pages.map((page, index) => (
             <div key={index} className="page-wrapper">
-              {entry ? (
-                <JournalPage entry={entry} isEven={index % 2 === 0} />
+              {page === 'decorative' ? (
+                <DecorativePage isEven={index % 2 === 0} />
+              ) : page ? (
+                <JournalPage entry={page} isEven={index % 2 === 0} />
               ) : (
                 <div className="diary-page page-shadow bg-gradient-to-br from-card to-muted/30 h-[733px]" />
               )}
