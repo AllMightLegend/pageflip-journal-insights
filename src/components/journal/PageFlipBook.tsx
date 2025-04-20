@@ -44,18 +44,29 @@ const PageFlipBook = ({ entries }: PageFlipBookProps) => {
       <div className="flex justify-center">
         <HTMLFlipBook
           width={550}
-          height={733} // A4 proportions
-          showCover={true}
-          maxShadowOpacity={0.5}
-          ref={bookRef}
-          onFlip={handlePageFlip}
-          className="shadow-xl"
-          startPage={0}
+          height={733}
           size="fixed"
           minWidth={315}
           maxWidth={1000}
           minHeight={400}
           maxHeight={1533}
+          maxShadowOpacity={0.5}
+          showCover={true}
+          mobileScrollSupport={true}
+          onFlip={handlePageFlip}
+          className="shadow-xl"
+          startPage={0}
+          drawShadow={true}
+          flippingTime={1000}
+          usePortrait={false}
+          startZIndex={0}
+          autoSize={false}
+          clickEventForward={false}
+          useMouseEvents={true}
+          swipeDistance={30}
+          showPageCorners={true}
+          disableFlipByClick={false}
+          ref={bookRef}
         >
           {pageEntries.map((entry, index) => (
             <div key={index} className="demoPage">
